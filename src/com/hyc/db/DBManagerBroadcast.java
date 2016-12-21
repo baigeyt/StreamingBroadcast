@@ -1,6 +1,8 @@
 package com.hyc.db;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.hyc.bean.StuInfo;
 
@@ -50,46 +52,41 @@ public class DBManagerBroadcast {
 		}
 	}
 	
-    public StuInfo getFirstData(){
-    	StuInfo sif = new StuInfo();
-//    	String columns[] = new String[]{"stu_cardno","classname","classcode","stu_name"};
-    	Cursor c = db.rawQuery(
-				"select * from broadcast limit 0,1", null);
+    public List<StuInfo> getFirstData(){
+    	List<StuInfo>  listSif = new ArrayList<StuInfo>();
+    	String columns[] = new String[]{"_id","stu_cardno","classname","classcode","stu_name"};
+    	Cursor c = db.query("broadcast", columns, null, null, null, null, null);
     	while (c.moveToNext()) {
+    		StuInfo	sif = new StuInfo();
     		sif.setId(c.getInt(c.getColumnIndex("_id")));
 			sif.setCardNum(c.getString(c.getColumnIndex("stu_cardno")));
 			sif.setClassName(c.getString(c.getColumnIndex("classname")));
 			sif.setClassCoded(c.getString(c.getColumnIndex("classcode")));
 			sif.setName(c.getString(c.getColumnIndex("stu_name")));
+			if(listSif.size()>0){
+				int eqnum = 0;
+				for(int i=0;i<listSif.size();i++){
+					if(sif.getClassCoded().equals(listSif.get(i).getClassCoded())){
+						eqnum++;
+					}
+				}	
+				if(eqnum==0){
+					listSif.add(sif);
+				}
+			}else{
+				listSif.add(sif);
+			}
 		}
 		c.close();
-		return sif;
-    }
-    
-    public String getSecondClassCode(){
-    	String secondClass = null;
-    	Cursor c = db.rawQuery(
-				"select classcode from broadcast limit 1,1", null);
-    	while (c.moveToNext()) {
-    		secondClass = c.getString(c.getColumnIndex("classcode"));
-		}
-		c.close();
-		return secondClass;
-    }
-    
-    public String getThirdClassCode(){
-    	String thirdClass = null;
-    	Cursor c = db.rawQuery(
-				"select classcode from broadcast limit 2,1", null);
-    	while (c.moveToNext()) {
-    		thirdClass = c.getString(c.getColumnIndex("classcode"));
-		}
-		c.close();
-		return thirdClass;
+		return listSif;
     }
     
     public void deleteRecord(int id){
     	db.delete("broadcast", "_id=?", new String[]{String.valueOf(id)});
+    }
+    
+    public void deleteAll(){
+    	db.delete("broadcast", null, null);
     }
 
 	private File getDir() {

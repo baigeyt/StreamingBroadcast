@@ -286,6 +286,7 @@ public class MainActivity extends Activity {
 		dBManagerSchPic.creatDB();
 		dbManagerstu.creatDB();
 		mDBManagerBroadcast.creatDB();
+		mDBManagerBroadcast.deleteAll();
 		mDBManagerCode.creatDB();
 		paths = new ArrayList<String>();
 		
@@ -1439,6 +1440,18 @@ public class MainActivity extends Activity {
 					}
 				}
 			}
+			
+			if (intent.getStringExtra("miss2") != null) {
+				if (intent.getStringExtra("miss2").equals("2")) {
+					timeIdentify = 0;
+				}
+			}
+
+			if (intent.getStringExtra("reflush2") != null) {
+				if (intent.getStringExtra("reflush2").equals("1")) {
+					timeIdentify = 1;
+				}
+			}
 		}
 
 	}
@@ -2511,44 +2524,17 @@ public class MainActivity extends Activity {
 				   while(true){
 					   if(isReadUSB){
 						   try {
-							   StuInfo mSif =  mDBManagerBroadcast.getFirstData();
-							 if(mSif.getClassCoded()!=null){
-								 Log.e("班级code",mSif.getClassCoded());
-								 String cardNum = mSif.getCardNum();
-								 String name = mSif.getName();   
-								 String className = mSif.getClassName();
-								 String classCode = mSif.getClassCoded();
-								 int id = mSif.getId();
-								 String content = classCode+"soundt,"+name;
-								 myEntry.driver.write(content.getBytes("GBK"), 200,handler);
-								 String secodeRe = mDBManagerBroadcast.getSecondClassCode();
-								 String thirdRe = mDBManagerBroadcast.getThirdClassCode();
-								 if(secodeRe!=null){
-									if(classCode.equals(secodeRe)){
-										Log.e("删除1", cardNum+"");
-										mDBManagerBroadcast.deleteRecord(id);
-										sleep(4000);
-									}else{
-										if(thirdRe!=null){
-											if(classCode.equals(thirdRe)){
-												mDBManagerBroadcast.deleteRecord(id);
-												sleep(4000);
-											}else{
-												mDBManagerBroadcast.deleteRecord(id);
-												sleep(100);
-											}
-										}else{
-											Log.e("删除2", cardNum+"");
-											mDBManagerBroadcast.deleteRecord(id);
-											sleep(100);	
-										}
-									}
-								 }else{
-									 Log.e("删除3", cardNum+"");
-									 mDBManagerBroadcast.deleteRecord(id);  
-									 sleep(4000);
-								 }
-							 } 
+							   List<StuInfo> sifList =  mDBManagerBroadcast.getFirstData();
+				                for(int i=0;i<sifList.size();i++){
+									 String name = sifList.get(i).getName();   
+									 String classCode = sifList.get(i).getClassCoded();
+									 int id = sifList.get(i).getId();
+									 String content = classCode+"soundt,"+name;
+									 myEntry.driver.write(content.getBytes("GBK"), 200,handler);
+									 mDBManagerBroadcast.deleteRecord(id);
+									 sleep(500);
+				                }
+				                sleep(3500);
 						} catch (UnsupportedEncodingException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
@@ -2560,10 +2546,11 @@ public class MainActivity extends Activity {
 							e.printStackTrace();
 						}
 					   }
-				   }
+				   }  
 				};
 			}.start();
 	}
+	
 	
 	
 

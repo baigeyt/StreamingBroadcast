@@ -54,6 +54,10 @@ public class RecBroadcast {
 				String errcode = jsonobject.getString("errcode");
 
 				if (errcode.equals("0")) {
+					Intent iSReflush = new Intent();
+					iSReflush.setAction("com.baige.ui.service");
+					iSReflush.putExtra("reflush2", "1");
+					mContext.sendBroadcast(iSReflush);
 					mDBManagerCode.deleteDB();
 					JSONArray jsonArray = new JSONObject(ic_String.substring(4))
 							.getJSONArray("data");
@@ -75,6 +79,11 @@ public class RecBroadcast {
 		} catch (Exception e) {
 
 			e.printStackTrace();
+		}finally{
+			Intent iSMiss = new Intent();
+			iSMiss.setAction("com.baige.ui.service");
+			iSMiss.putExtra("miss2", "2");
+			mContext.sendBroadcast(iSMiss);
 		}
 		mDBManagerCode.closeDB();
 	}
